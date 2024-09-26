@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Philosopher Explorer</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Merriweather:wght@300;700&family=Roboto:wght@400;500&display=swap" rel="stylesheet">
+</head>
+<body>
+    <header>
+        <h1>Philosopher Explorer</h1>
+        <p>Explore the great minds of philosophy. Filter by name, nationality, and gender to find a philosopher who resonates with you.</p>
+    </header>
+
+    <section id="filter-section">
+        <input type="text" id="search-input" placeholder="Search">
+        <select id="nationality-input">
+            <option value="">Nationality</option>
+            <option value="American">American</option>
+            <option value="Andalusian">Andalusian</option>
+            <option value="Austrian">Austrian</option>
+            <option value="British">British</option>
+            <option value="Danish">Danish</option>
+            <option value="Dutch">Dutch</option>
+            <option value="English">English</option>
+            <option value="French">French</option>
+            <option value="German">German</option>
+            <option value="Greek">Greek</option>
+            <option value="Irish">Irish</option>
+            <option value="Italian">Italian</option>
+            <option value="Norwegian">Norwegian</option>
+            <option value="Polish">Polish</option>
+            <option value="Roman">Roman</option>
+            <option value="Slovenian">Slovenian</option>
+            <option value="Swiss">Swiss</option>
+        </select>
+
+        <select id="gender-input">
+            <option value="">Gender</option>
+            <option value="Male">Male</option>
+            <option value="Female">Female</option>
+            <option value="Non-binary">Non-Binary</option>
+        </select>
+
+        <button id="clear-filters">Clear Filters</button>
+    </section>
+
+    <section id="philosopher-list"></section>
+
+    <footer>
+        <p>&copy; 2024 Philosopher Explorer. All rights reserved.</p>
+    </footer>
+
+    <script src="scripts.js"></script>
+</body>
+</html>

@@ -1,0 +1,110 @@
+/* Body */
+body {
+    background-color: #f5f5f5;
+    font-family: 'Roboto', sans-serif;
+    color: #333;
+    margin: 0;
+    padding: 0;
+}
+
+/* Header */
+header {
+    background-color: #444;
+    color: white;
+    text-align: center;
+    padding: 30px 0;
+    margin-bottom: 20px;
+}
+
+header h1 {
+    font-size: 2.8em;
+    margin-bottom: 10px;
+}
+
+header p {
+    font-size: 1.2em;
+}
+
+/* Filter Section */
+#filter-section {
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 8px;
+    width: 80%;
+    margin: 20px auto;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    display: flex;
+    justify-content: space-around;
+}
+
+#filter-section input, #filter-section select {
+    padding: 10px;
+    font-size: 1.1em;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+    width: 200px;
+}
+
+button#clear-filters {
+    background-color: #ff4b4b;
+    color: white;
+    padding: 10px 20px;
+    font-size: 1.1em;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+button#clear-filters:hover {
+    background-color: #e43a3a;
+}
+
+/* Philosopher List */
+#philosopher-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 20px;
+    padding: 20px;
+    width: 80%;
+    margin: 0 auto;
+}
+
+.philosopher-card {
+    background-color: white;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    text-align: center;
+    transition: transform 0.2s ease;
+}
+
+/* Make philosopher images circular with a 3D porthole effect */
+.philosopher-card img {
+    width: 150px;             /* Set a fixed width */
+    height: 150px;            /* Set a fixed height to maintain square shape */
+    border-radius: 50%;       /* Make it circular */
+    object-fit: cover;        /* Prevent distortion */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);  /* Add a shadow for the 3D effect */
+    border: 4px solid white;  /* Add a border for contrast */
+    margin-bottom: 15px;
+    transition: box-shadow 0.3s ease; /* Smooth hover effect */
+}
+
+.philosopher-card h3 {
+    margin: 10px 0;
+    font-size: 1.4em;
+}
+
+.philosopher-card p {
+    font-size: 1.1em;
+    color: #666;
+}
+
+/* Footer */
+footer {
+    text-align: center;
+    padding: 20px;
+    background-color: #444;
+    color: white;
+    margin-top: 30px;
+}
