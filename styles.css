@@ -5,17 +5,18 @@ html, body {
     height: 100%;
     margin: 0;
     padding: 0;
-    box-sizing: border-box; /* Include padding and border in width/height calculations */
-    overflow-x: hidden; /* Prevent any horizontal scrolling from happening */
+    box-sizing: border-box;
+    overflow-x: hidden; /* Prevent horizontal scrolling */
 }
 
 /* Body */
 body {
-    background-color: #f5f5f5;
-    color: #333;
+    background-color: #f0f4f2; /* A soft, light green for a forest-like vibe */
+    color: #3b3a30; /* Warm dark brown */
     font-family: 'Noto Sans', sans-serif;
-    margin: 0;
-    padding: 0;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
 }
 
 /* Make the main content area grow to fill the available space */
@@ -25,7 +26,7 @@ body > *:not(footer) {
 
 /* Header */
 header {
-    background-color: #aca5a5;
+    background-color: #A3B18A; /* Soft olive green */
     color: white;
     margin: 0;
     padding: 30px 0;
@@ -53,20 +54,17 @@ header p {
 /* Filter Section */
 #filter-section {
     align-items: center;
-    background-color: #fff;
+    background-color: hsl(150, 15%, 95%); /* Match body background */
     border-radius: 0;
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
     display: flex;
-    gap: 10px; /* Space between items */
-    justify-content: center; /* Center items */
-    padding: 15px 0 15px 0; /* Add padding */
-    position: -webkit-sticky; /* For Safari */
+    gap: 10px;
+    justify-content: center;
+    padding: 15px 0;
     position: sticky;
     top: 0;
     width: 100%;
     z-index: 100;
-    max-width: 100%;
-    height: 60px; /* Fixed height */
 }
 
 /* Group the buttons together */
@@ -111,7 +109,7 @@ header p {
     #filter-section {
         align-items: center;
         flex-direction: column;
-        padding: 15px 0 15px 0; /* Add padding */
+        padding: 15px 0;
         width: 100%;
         height: auto;
     }
@@ -143,6 +141,7 @@ header p {
     header p {
         font-size: 1em;
     }
+
     #reset-filters {
         width: 70%;
     }
@@ -150,13 +149,13 @@ header p {
 
 /* Footer styles */
 footer {
-    background-color: #aca5a5;
-    bottom: 0;
-    color: #2d2c2c;
+    background-color: #A3B18A; /* Same as header */
+    color: #f0f4f2;
     padding: 20px;
-    position: relative;
     text-align: center;
     width: 100%;
+    position: relative; /* Make sure it's relative so it can move naturally with content */
+    bottom: 0;
 }
 
 /* Style for no philosophers found message */
@@ -166,110 +165,139 @@ footer {
     font-size: 1.2em;
     color: #333;
     padding: 20px;
+    margin-top: 50px;
 }
 
 /* Philosopher List */
 #philosopher-list {
     display: grid;
-    gap: 20px;
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 30px; /* Space between the cards */
+    grid-template-columns: repeat(auto-fit, 280px); /* Fixed card width */
+    justify-content: center; /* Center the cards */
+    justify-items: center; /* Ensure each card is centered */
     margin: 0 auto;
     padding: 20px;
-    width: 80%;
+    width: 100%; /* Full width grid */
+    max-width: 1200px; /* Limit the max width of the grid */
+    flex-grow: 1;
+    min-height: 300px;
 }
 
+
+/* Philosopher Cards */
 .philosopher-card {
     background-color: white;
-    border-radius: 8px;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    padding: 20px;
+    border-radius: 6px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    padding: 15px;
     text-align: center;
     transition: transform 0.2s ease;
+    display: flex;
+    max-width: 300px;
+    flex-direction: column;
+    justify-content: space-between;
 }
 
-.philosopher-card a.button {
-    background-color: #5e5d5d;
-    border-radius: 5px;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    color: white;
-    display: inline-block;
-    font-family: 'Noto Sans', sans-serif;
-    font-size: 0.8em;
-    letter-spacing: .05rem;
-    padding: 10px 20px;
-    text-decoration: none;
-    text-transform: uppercase;
-    transition: background-color 0.3s ease, transform 0.2s ease;
-}
-
-.philosopher-card a.button:hover {
-    background-color: #333;
-    color: #fff;
-}
-
-.philosopher-card a.button:active {
-    background-color: #666666;
+/* Image and name section */
+.philosopher-card img {
+    border: 3px solid white;
+    border-radius: 50%;
+    box-shadow: 0 3px 6px rgba(0, 0, 0, 0.15);
+    height: 120px;
+    width: 120px;
+    margin: 0 auto 10px auto;
+    object-fit: cover;
 }
 
 .philosopher-card h3 {
-    color: #2d2c2c !important;
-    font-size: 1.4em;
-    margin: 10px 0;
+    font-size: 1.2em;
+    margin: 6px 0;
+    color: #2d2c2c;
 }
 
-.philosopher-card img {
-    border: 4px solid white;
-    border-radius: 50%;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-    height: 150px;
-    margin-bottom: 15px;
-    object-fit: cover;
-    transition: box-shadow 0.3s ease;
-    width: 150px;
+.philosopher-card p.philosopher-years {
+    font-size: 1em;
+    color: #666;
+    margin: 4px 0;
 }
 
-.philosopher-card p {
+/* Summary */
+.philosopher-card p.philosopher-summary {
+    flex-grow: 1;
+    font-size: 1em;
     color: #666;
     font-family: 'Noto Serif', serif;
-    font-size: 1.1em;
+    margin: 10px 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
 }
 
+/* Button section */
+.philosopher-card a.button {
+    background-color: #8C9A77; /* Forest green */
+    color: #f0f4f2;
+    border-radius: 5px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    padding: 10px 20px;
+    text-decoration: none;
+    text-transform: uppercase;
+    font-size: 0.8em;
+    transition: background-color 0.3s ease;
+    margin-top: auto;
+    display: inline-block;
+}
+
+.philosopher-card a.button:hover {
+    background-color: #7B8D67; /* Darker green on hover */
+}
+
+/* Name */
 .philosopher-name {
     font-family: 'Noto Sans', sans-serif;
-    font-size: 1.4em !important;
+    font-size: 1.2em !important;
     font-weight: 400;
-    letter-spacing: .1rem;
+    letter-spacing: .05rem;
     text-transform: uppercase;
 }
 
+/* Summary */
 .philosopher-summary {
-    font-size: 1.3em !important;
+    color: #808080 !important;
+    font-size: 1.2em !important;
+    font-style: italic;
+    font-weight: 400;
+    letter-spacing: .01rem;
 }
 
 /* Style for the 'Reset Filters' button */
 #reset-filters {
-    background-color: #5e5d5d;
+    background-color: #8C9A77;
     border-radius: 5px;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1);
     color: white;
-    display: inline-block;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
     font-family: 'Noto Sans', sans-serif;
-    font-size: 0.8em;
-    letter-spacing: .05rem;
-    padding: 10px 20px;
-    text-align: center !important;
+    font-size: 0.75em;
+    height: 40px;
+    padding: 0 16px;
+    text-align: center;
     text-decoration: none;
     text-transform: uppercase;
     transition: background-color 0.3s ease, transform 0.2s ease;
 }
 
 #reset-filters:hover {
-    background-color: #333;
+    background-color: #7B8D67;
     color: #fff;
 }
 
 #reset-filters:active {
-    background-color: #666666;
+    background-color: #3f5a27;
 }
 
 /* Spinner styles (updated to fix the visibility issue) */
@@ -279,14 +307,14 @@ footer {
     border-radius: 50%;
     border-top: 8px solid #444444;
     display: none;
-    height: 40px; /* Ensure spinner matches input height */
+    height: 40px;
     left: 50%;
     margin: -30px 0 0 -30px;
     opacity: 0;
     position: fixed;
     top: 50%;
     transition: opacity 0.3s ease-in-out;
-    width: 40px; /* Ensure spinner matches button size */
+    width: 40px;
     z-index: 1000;
 }
 
