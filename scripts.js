@@ -1,144 +1,186 @@
 // DOM Elements
-const philosopherList = document.getElementById('philosopher-list');  // Container for philosophers
-const nationalityInput = document.getElementById('nationality-input');  // Nationality filter input
-const genderInput = document.getElementById('gender-input');  // Gender filter input
+const philosopherList = document.getElementById('philosopher-list');
+const nationalityInput = document.getElementById('nationality-input');
+const genderInput = document.getElementById('gender-input');
 
-// Global array to hold the parsed and sorted philosopher data
+// Global array to hold the parsed philosopher data
 let sortedPhilosophers = [];
 
 /**
- * Show the loading spinner
+ * Show and hide the loading spinner
  */
 function showSpinner() {
-    const spinner = document.getElementById('loading-spinner');
-    spinner.classList.add('show');  // Show the spinner
+    document.getElementById('loading-spinner').classList.add('show');
 }
 
-/**
- * Hide the loading spinner
- */
 function hideSpinner() {
-    const spinner = document.getElementById('loading-spinner');
-    spinner.classList.remove('show');  // Hide the spinner
+    document.getElementById('loading-spinner').classList.remove('show');
 }
 
 /**
- * Fetch philosopher data from Google Sheets CSV and process it
+ * Fetch philosopher data from Google Sheets CSV
  */
 async function fetchPhilosophersFromCSV() {
-    showSpinner();  // Show the spinner while loading data
+    showSpinner();
     const url = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSTexYY-ShRiKDVucP5CY5sNWmDkPxlpKxWPV4FSwwDmeixRaay4a69sKNSYi0o6d-LafNkuTg1JlH7/pub?output=csv";
     const response = await fetch(url);
     const text = await response.text();
 
-    // Parse and sort the CSV data
-    const data = parseCSV(text);
-    sortedPhilosophers = sortPhilosophers(data);
-
-    // Render the sorted philosopher data to the page
+    sortedPhilosophers = sortPhilosophers(parseCSV(text));
     await renderPhilosophers(sortedPhilosophers);
-
-    hideSpinner();  // Hide the spinner when loading is done
+    hideSpinner();
 }
 
 /**
- * CSV parsing function to handle quoted fields and commas
+ * Parse CSV data
  * @param {string} text - CSV content
  * @returns {Array} Parsed philosopher objects
  */
 function parseCSV(text) {
-    const lines = text.split('\n').slice(1); // Skip the CSV header row
-
-    return lines.map(line => {
+    return text.split('\n').slice(1).map(line => {
         let columns = [];
         let current = '';
         let insideQuotes = false;
 
         for (let i = 0; i < line.length; i++) {
             const char = line[i];
-
             if (char === '"' && insideQuotes) {
                 if (line[i + 1] === '"') {
-                    current += '"'; // Add escaped quote
-                    i++;  // Skip the next quote
+                    current += '"'; 
+                    i++;
                 } else {
-                    insideQuotes = false; // End of quoted field
+                    insideQuotes = false;
                 }
             } else if (char === '"' && !insideQuotes) {
-                insideQuotes = true;  // Start of quoted field
+                insideQuotes = true;
             } else if (char === ',' && !insideQuotes) {
-                columns.push(current.trim());  // Add the trimmed column value
-                current = '';  // Reset the current column
+                columns.push(current.trim());
+                current = '';
             } else {
-                current += char;  // Add regular characters
+                current += char;
             }
         }
-        columns.push(current.trim());  // Add the last column
+        columns.push(current.trim());
 
-        // Parse the birth year, or set to -Infinity if invalid
-        let born = parseInt(columns[0], 10);
-        if (isNaN(born)) born = -Infinity;
-
+        const born = parseInt(columns[0], 10);
         return {
-            born,  // Birth year
-            died: columns[1].trim(),  // Death year
-            nationality: columns[2].trim(),  // Nationality
-            gender: columns[3].trim(),  // Gender
-            name: columns[4].trim(),  // Name
-            summary: columns[5].trim()  // Summary
+            born: isNaN(born) ? -Infinity : born,
+            died: columns[1].trim(),
+            nationality: columns[2].trim(),
+            gender: columns[3].trim(),
+            name: columns[4].trim(),
+            summary: columns[5].trim(),
         };
     });
 }
 
 /**
- * Sort philosophers by birth year, falling back to name for identical years
- * @param {Array} philosophers - Array of philosopher objects
- * @returns {Array} Sorted philosophers array
+ * Sort philosophers by birth year or name
+ * @param {Array} philosophers
+ * @returns {Array} Sorted philosophers
  */
 function sortPhilosophers(philosophers) {
-    return philosophers.sort((a, b) => {
-        if (a.born === b.born) {
-            return a.name.localeCompare(b.name);  // Sort alphabetically by name if birth years are the same
-        }
-        return a.born - b.born;  // Sort by birth year (BC years as negative values)
-    });
+    return philosophers.sort((a, b) => a.born === b.born ? a.name.localeCompare(b.name) : a.born - b.born);
 }
 
 /**
- * Fetch philosopher images from the Wikipedia API
- * @param {string} name - Philosopher's name
+ * Fetch philosopher image from Wikipedia API
+ * @param {string} name
  * @returns {string} Image URL or placeholder
  */
 async function fetchPhilosopherImage(name) {
-    const url = `https://en.wikipedia.org/w/api.php?action=query&format=json&origin=*&prop=pageimages&piprop=thumbnail&pithumbsize=200&titles=${encodeURIComponent(name)}`;
+    const url = `https://en.wikipedia.org/w/api.php?action=query&format=json&origin=*&prop=pageimages|images&piprop=thumbnail&pithumbsize=200&redirects=1&titles=${encodeURIComponent(name)}`;
     const response = await fetch(url);
     const data = await response.json();
     const page = Object.values(data.query.pages)[0];
-    return page?.thumbnail?.source || 'placeholder.jpg';  // Return the image URL or a placeholder
+
+    // Handle redirects
+    if (data.query?.redirects) {
+        const resolvedTitle = data.query.redirects[0].to;
+        return fetchPhilosopherImage(resolvedTitle);
+    }
+
+    // Prioritize thumbnail from the infobox
+    if (page?.thumbnail?.source) {
+        return page.thumbnail.source;
+    }
+
+    // Fallback to any valid image
+    if (page?.images) {
+        for (const image of page.images) {
+            if (isValidImage(image.title, name)) {
+                const imageUrl = await fetchImageUrl(image.title);
+                if (imageUrl) return imageUrl;
+            }
+        }
+    }
+
+    // Fallback to exact image search
+    const exactImageUrl = await fetchExactImageUrl(name);
+    return exactImageUrl || 'placeholder.jpg';
 }
 
 /**
- * Format the philosopher's birth/death year to display BC/AD correctly
- * @param {string|number} year - Birth or death year
+ * Check if an image is valid based on its title
+ * @param {string} imageTitle
+ * @param {string} name
+ * @returns {boolean}
+ */
+function isValidImage(imageTitle, name) {
+    return imageTitle.toLowerCase().includes(name.toLowerCase()) &&
+           !imageTitle.toLowerCase().includes('portal') &&
+           !imageTitle.toLowerCase().includes('logo') &&
+           !imageTitle.toLowerCase().includes('icon') &&
+           !imageTitle.toLowerCase().endsWith('.svg');
+}
+
+/**
+ * Fetch image URL for a specific image title
+ * @param {string} imageTitle
+ * @returns {string|null} Image URL or null
+ */
+async function fetchImageUrl(imageTitle) {
+    const url = `https://en.wikipedia.org/w/api.php?action=query&format=json&origin=*&titles=${encodeURIComponent(imageTitle)}&prop=imageinfo&iiprop=url`;
+    const response = await fetch(url);
+    const data = await response.json();
+    const imagePage = Object.values(data.query.pages)[0];
+    return imagePage?.imageinfo ? imagePage.imageinfo[0].url : null;
+}
+
+/**
+ * Fetch exact image URL based on philosopher name
+ * @param {string} name
+ * @returns {string|null} Image URL or null
+ */
+async function fetchExactImageUrl(name) {
+    const exactFileName = `File:${name.replace(/\s/g, '')}.jpg`;
+    const url = `https://en.wikipedia.org/w/api.php?action=query&format=json&origin=*&titles=${encodeURIComponent(exactFileName)}&prop=imageinfo&iiprop=url`;
+    const response = await fetch(url);
+    const data = await response.json();
+    const imagePage = Object.values(data.query.pages)[0];
+    return imagePage?.imageinfo ? imagePage.imageinfo[0].url : null;
+}
+
+/**
+ * Format year for display (BC/AD)
+ * @param {string|number} year
  * @returns {string} Formatted year
  */
 function formatYear(year) {
-    if (!year) return "Present";  // Handle philosophers who are still alive
     const yearNum = parseInt(year, 10);
-    return yearNum < 0 ? `${Math.abs(yearNum)} BC` : `${yearNum}`;  // Convert BC years to positive numbers
+    return isNaN(yearNum) ? 'Present' : (yearNum < 0 ? `${Math.abs(yearNum)} BC` : yearNum.toString());
 }
 
 /**
- * Build and return a philosopher card element
- * @param {Object} philosopher - Philosopher object
- * @returns {HTMLElement} Philosopher card element
+ * Display philosopher card
+ * @param {Object} philosopher
+ * @returns {HTMLElement} Philosopher card
  */
 async function displayPhilosopher(philosopher) {
-    const imgUrl = await fetchPhilosopherImage(philosopher.name);  // Fetch philosopher image
-    const birthYear = formatYear(philosopher.born);  // Format birth year
-    const deathYear = philosopher.died ? formatYear(philosopher.died) : "Present";  // Format death year
+    const imgUrl = await fetchPhilosopherImage(philosopher.name);
+    const birthYear = formatYear(philosopher.born);
+    const deathYear = philosopher.died ? formatYear(philosopher.died) : "Present";
 
-    // Create a philosopher card element
     const card = document.createElement('div');
     card.className = 'philosopher-card';
     card.innerHTML = `
@@ -148,60 +190,47 @@ async function displayPhilosopher(philosopher) {
         <p class="philosopher-summary">${philosopher.summary}</p>
         <a href="https://en.wikipedia.org/wiki/${encodeURIComponent(philosopher.name)}" target="_blank" class="button">Learn More</a>
     `;
-    return card;  // Return the completed philosopher card element
+    return card;
 }
 
 /**
- * Render the sorted and filtered philosophers to the page
- * @param {Array} philosophers - Array of philosopher objects
+ * Render philosophers based on filters
+ * @param {Array} philosophers
  */
 async function renderPhilosophers(philosophers) {
-    philosopherList.innerHTML = '';  // Clear the philosopher list
-
-    // Filter philosophers based on selected nationality and gender
+    philosopherList.innerHTML = '';
     const nationality = nationalityInput.value;
     const gender = genderInput.value;
-    const filteredPhilosophers = philosophers.filter(philosopher => {
-        return (
-            (!nationality || philosopher.nationality === nationality) &&
-            (!gender || philosopher.gender.toLowerCase() === gender.toLowerCase())
-        );
-    });
 
-    // Check if no philosophers match the filter criteria
+    const filteredPhilosophers = philosophers.filter(philosopher =>
+        (!nationality || philosopher.nationality === nationality) &&
+        (!gender || philosopher.gender.toLowerCase() === gender.toLowerCase())
+    );
+
     if (filteredPhilosophers.length === 0) {
         philosopherList.innerHTML = '<p class="no-results-message">No philosophers found matching the selected criteria.</p>';
         return;
     }
 
-    // Sort and display filtered philosophers
-    const sortedFilteredPhilosophers = sortPhilosophers(filteredPhilosophers);
-    const philosopherCards = await Promise.all(sortedFilteredPhilosophers.map(displayPhilosopher));
-
-    // Append each philosopher card to the philosopher list
-    philosopherCards.forEach(card => {
-        philosopherList.appendChild(card);
-    });
+    const philosopherCards = await Promise.all(filteredPhilosophers.map(displayPhilosopher));
+    philosopherCards.forEach(card => philosopherList.appendChild(card));
 }
 
-// Event listeners for filter inputs
+/**
+ * Event listeners for filter inputs and reset button
+ */
 [nationalityInput, genderInput].forEach(input => {
     input.addEventListener('input', async () => {
-        showSpinner();  // Show spinner when filters are changed
-        await renderPhilosophers(sortedPhilosophers);  // Re-render philosophers with updated filters
-        hideSpinner();  // Hide spinner after re-rendering is complete
+        showSpinner();
+        await renderPhilosophers(sortedPhilosophers);
+        hideSpinner();
     });
 });
 
-// Event listener for Reset Filters button
-document.getElementById('reset-filters').addEventListener('click', function (e) {
-    e.preventDefault();  // Prevent default anchor behavior
-
-    // Reset the filter inputs
+document.getElementById('reset-filters').addEventListener('click', (e) => {
+    e.preventDefault();
     nationalityInput.value = "";
     genderInput.value = "";
-
-    // Re-render all philosophers
     renderPhilosophers(sortedPhilosophers);
 });
 
