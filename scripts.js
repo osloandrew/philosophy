@@ -186,7 +186,7 @@ async function displayPhilosopher(philosopher) {
     card.innerHTML = `
         <img src="${imgUrl}" alt="${philosopher.name}" onerror="this.src='placeholder.jpg';">
         <h3 class="philosopher-name">${philosopher.name}</h3>
-        <p>${birthYear} - ${deathYear}</p>
+        <p class="philosopher-years">${birthYear} - ${deathYear}</p>
         <p class="philosopher-summary">${philosopher.summary}</p>
         <a href="https://en.wikipedia.org/wiki/${encodeURIComponent(philosopher.name)}" target="_blank" class="button">Learn More</a>
     `;
@@ -198,7 +198,8 @@ async function displayPhilosopher(philosopher) {
  * @param {Array} philosophers
  */
 async function renderPhilosophers(philosophers) {
-    philosopherList.innerHTML = '';
+    philosopherList.innerHTML = '';  // Clear the philosopher list
+
     const nationality = nationalityInput.value;
     const gender = genderInput.value;
 
@@ -209,12 +210,17 @@ async function renderPhilosophers(philosophers) {
 
     if (filteredPhilosophers.length === 0) {
         philosopherList.innerHTML = '<p class="no-results-message">No philosophers found matching the selected criteria.</p>';
+        philosopherList.style.minHeight = '300px'; // Ensure min-height when empty
         return;
     }
 
     const philosopherCards = await Promise.all(filteredPhilosophers.map(displayPhilosopher));
     philosopherCards.forEach(card => philosopherList.appendChild(card));
+
+    // Reset min-height when cards are displayed
+    philosopherList.style.minHeight = '';
 }
+
 
 /**
  * Event listeners for filter inputs and reset button
@@ -227,12 +233,23 @@ async function renderPhilosophers(philosophers) {
     });
 });
 
-document.getElementById('reset-filters').addEventListener('click', (e) => {
+document.getElementById('reset-filters').addEventListener('click', async (e) => {
     e.preventDefault();
+
+    // Show the spinner when reset is clicked
+    showSpinner();
+
+    // Reset the filter inputs
     nationalityInput.value = "";
     genderInput.value = "";
-    renderPhilosophers(sortedPhilosophers);
+
+    // Re-render all philosophers with the spinner shown
+    await renderPhilosophers(sortedPhilosophers);
+
+    // Hide the spinner after the rendering is done
+    hideSpinner();
 });
+
 
 // Fetch and display philosophers on page load
 fetchPhilosophersFromCSV();
