@@ -122,6 +122,7 @@ header p {
 
     #philosopher-list {
         grid-template-columns: 1fr;
+        padding: 20px 0 20px 0 !important;
     }
 
     .philosopher-card a.button,
