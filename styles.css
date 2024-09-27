@@ -1,110 +1,305 @@
+/* Ensure the body and html fill the whole viewport */
+html, body {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box; /* Include padding and border in width/height calculations */
+    overflow-x: hidden; /* Prevent any horizontal scrolling from happening */
+}
+
 /* Body */
 body {
     background-color: #f5f5f5;
-    font-family: 'Roboto', sans-serif;
     color: #333;
+    font-family: 'Noto Sans', sans-serif;
     margin: 0;
     padding: 0;
 }
 
+/* Make the main content area grow to fill the available space */
+body > *:not(footer) {
+    flex-grow: 1;
+}
+
 /* Header */
 header {
-    background-color: #444;
+    background-color: #aca5a5;
     color: white;
-    text-align: center;
+    margin: 0;
     padding: 30px 0;
-    margin-bottom: 20px;
+    text-align: center;
+    width: 100%;
 }
 
 header h1 {
-    font-size: 2.8em;
-    margin-bottom: 10px;
+    color: #2d2c2c;
+    font-family: 'Grenze Gotisch', serif;
+    font-size: 3em;
+    margin-bottom: 5px;
 }
 
 header p {
+    color: #2d2c2c;
+    font-family: 'Noto Sans', sans-serif;
     font-size: 1.2em;
+    margin-bottom: 20px;
+    font-weight: 400;
+    letter-spacing: .1rem;
+    text-transform: uppercase;
 }
 
 /* Filter Section */
 #filter-section {
+    align-items: center;
     background-color: #fff;
-    padding: 20px;
-    border-radius: 8px;
-    width: 80%;
-    margin: 20px auto;
+    border-radius: 0;
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
     display: flex;
-    justify-content: space-around;
+    gap: 10px; /* Space between items */
+    justify-content: center; /* Center items */
+    padding: 15px 0 15px 0; /* Add padding */
+    position: -webkit-sticky; /* For Safari */
+    position: sticky;
+    top: 0;
+    width: 100%;
+    z-index: 100;
+    max-width: 100%;
+    height: 60px; /* Fixed height */
 }
 
+/* Group the buttons together */
+#filter-section .filter-buttons {
+    display: flex;
+    gap: 10px; /* Space between the buttons */
+}
+
+/* Style the select and input elements to match the design */
 #filter-section input, #filter-section select {
-    padding: 10px;
-    font-size: 1.1em;
-    border-radius: 5px;
+    background-color: #f9f9f9;
     border: 1px solid #ccc;
-    width: 200px;
-}
-
-button#clear-filters {
-    background-color: #ff4b4b;
-    color: white;
-    padding: 10px 20px;
-    font-size: 1.1em;
-    border: none;
     border-radius: 5px;
-    cursor: pointer;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    color: #333;
+    font-family: 'Roboto', sans-serif;
+    font-size: 1em;
+    height: 40px;
+    padding: 10px;
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+    width: 200px; /* Fixed width */
 }
 
-button#clear-filters:hover {
-    background-color: #e43a3a;
+#filter-section input:focus, #filter-section select:focus {
+    border-color: #666;
+    box-shadow: 0 0 5px rgba(102, 102, 102, 0.5);
+    outline: none;
+}
+
+#filter-section input:hover, #filter-section select:hover {
+    border-color: #888;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+/* Ensure Reset Filter Button and Spinner Stay Same Height */
+#filter-section button, .spinner {
+    height: 40px; /* Match height of input/select */
+}
+
+/* Responsive Design: Stack filters on smaller screens */
+@media (max-width: 768px) {
+    #filter-section {
+        align-items: center;
+        flex-direction: column;
+        padding: 15px 0 15px 0; /* Add padding */
+        width: 100%;
+        height: auto;
+    }
+
+    #filter-section input, #filter-section select {
+        height: 40px;
+        margin-bottom: 10px;
+        width: 80%;
+    }
+
+    #philosopher-list {
+        grid-template-columns: 1fr;
+    }
+
+    .philosopher-card a.button,
+    #reset-filters {
+        font-size: 1em;
+        padding: 12px 16px;
+    }
+
+    header {
+        padding: 15px 0;
+    }
+
+    header h1 {
+        font-size: 2em;
+    }
+
+    header p {
+        font-size: 1em;
+    }
+    #reset-filters {
+        width: 70%;
+    }
+}
+
+/* Footer styles */
+footer {
+    background-color: #aca5a5;
+    bottom: 0;
+    color: #2d2c2c;
+    padding: 20px;
+    position: relative;
+    text-align: center;
+    width: 100%;
+}
+
+/* Style for no philosophers found message */
+.no-results-message {
+    text-align: center;
+    font-family: 'Roboto', sans-serif;
+    font-size: 1.2em;
+    color: #333;
+    padding: 20px;
 }
 
 /* Philosopher List */
 #philosopher-list {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
     gap: 20px;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    margin: 0 auto;
     padding: 20px;
     width: 80%;
-    margin: 0 auto;
 }
 
 .philosopher-card {
     background-color: white;
-    padding: 20px;
     border-radius: 8px;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    padding: 20px;
     text-align: center;
     transition: transform 0.2s ease;
 }
 
-/* Make philosopher images circular with a 3D porthole effect */
-.philosopher-card img {
-    width: 150px;             /* Set a fixed width */
-    height: 150px;            /* Set a fixed height to maintain square shape */
-    border-radius: 50%;       /* Make it circular */
-    object-fit: cover;        /* Prevent distortion */
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);  /* Add a shadow for the 3D effect */
-    border: 4px solid white;  /* Add a border for contrast */
-    margin-bottom: 15px;
-    transition: box-shadow 0.3s ease; /* Smooth hover effect */
+.philosopher-card a.button {
+    background-color: #5e5d5d;
+    border-radius: 5px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    color: white;
+    display: inline-block;
+    font-family: 'Noto Sans', sans-serif;
+    font-size: 0.8em;
+    letter-spacing: .05rem;
+    padding: 10px 20px;
+    text-decoration: none;
+    text-transform: uppercase;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+.philosopher-card a.button:hover {
+    background-color: #333;
+    color: #fff;
+}
+
+.philosopher-card a.button:active {
+    background-color: #666666;
 }
 
 .philosopher-card h3 {
-    margin: 10px 0;
+    color: #2d2c2c !important;
     font-size: 1.4em;
+    margin: 10px 0;
+}
+
+.philosopher-card img {
+    border: 4px solid white;
+    border-radius: 50%;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    height: 150px;
+    margin-bottom: 15px;
+    object-fit: cover;
+    transition: box-shadow 0.3s ease;
+    width: 150px;
 }
 
 .philosopher-card p {
-    font-size: 1.1em;
     color: #666;
+    font-family: 'Noto Serif', serif;
+    font-size: 1.1em;
 }
 
-/* Footer */
-footer {
-    text-align: center;
-    padding: 20px;
-    background-color: #444;
+.philosopher-name {
+    font-family: 'Noto Sans', sans-serif;
+    font-size: 1.4em !important;
+    font-weight: 400;
+    letter-spacing: .1rem;
+    text-transform: uppercase;
+}
+
+.philosopher-summary {
+    font-size: 1.3em !important;
+}
+
+/* Style for the 'Reset Filters' button */
+#reset-filters {
+    background-color: #5e5d5d;
+    border-radius: 5px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
     color: white;
-    margin-top: 30px;
+    display: inline-block;
+    font-family: 'Noto Sans', sans-serif;
+    font-size: 0.8em;
+    letter-spacing: .05rem;
+    padding: 10px 20px;
+    text-align: center !important;
+    text-decoration: none;
+    text-transform: uppercase;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+#reset-filters:hover {
+    background-color: #333;
+    color: #fff;
+}
+
+#reset-filters:active {
+    background-color: #666666;
+}
+
+/* Spinner styles (updated to fix the visibility issue) */
+.spinner {
+    animation: spin 1s linear infinite;
+    border: 8px solid #f3f3f3;
+    border-radius: 50%;
+    border-top: 8px solid #444444;
+    display: none;
+    height: 40px; /* Ensure spinner matches input height */
+    left: 50%;
+    margin: -30px 0 0 -30px;
+    opacity: 0;
+    position: fixed;
+    top: 50%;
+    transition: opacity 0.3s ease-in-out;
+    width: 40px; /* Ensure spinner matches button size */
+    z-index: 1000;
+}
+
+.spinner.show {
+    display: block;
+    opacity: 1;
+}
+
+@keyframes spin {
+    0% {
+        transform: rotate(0deg);
+    }
+    100% {
+        transform: rotate(360deg);
+    }
 }
