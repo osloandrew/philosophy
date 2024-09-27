@@ -3,36 +3,51 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Philosopher Explorer</title>
+    <title>Five-Word Philosophy</title>
     <link rel="stylesheet" href="styles.css">
+    <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="favicon-16x16.png">
     <link href="https://fonts.googleapis.com/css2?family=Merriweather:wght@300;700&family=Roboto:wght@400;500&display=swap" rel="stylesheet">
+    <style> 
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans:ital,wght@0,100..900;1,100..900&family=Noto+Serif:ital,wght@0,100..900;1,100..900&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Grenze+Gotisch:wght@100..900&display=swap');
+        </style>
 </head>
 <body>
     <header>
-        <h1>Philosopher Explorer</h1>
-        <p>Explore the great minds of philosophy. Filter by name, nationality, and gender to find a philosopher who resonates with you.</p>
+        <h1>Five-Word Philosophy</h1>
+        <p>Explore the great minds of philosophy</p>
     </header>
+<!-- Loading spinner (initially hidden) -->
+<div id="loading-spinner" class="spinner"></div>
 
     <section id="filter-section">
-        <input type="text" id="search-input" placeholder="Search">
         <select id="nationality-input">
             <option value="">Nationality</option>
             <option value="American">American</option>
             <option value="Andalusian">Andalusian</option>
             <option value="Austrian">Austrian</option>
             <option value="British">British</option>
+            <option value="Canadian">Canadian</option>
             <option value="Danish">Danish</option>
             <option value="Dutch">Dutch</option>
             <option value="English">English</option>
             <option value="French">French</option>
             <option value="German">German</option>
             <option value="Greek">Greek</option>
+            <option value="Indian">Indian</option>
             <option value="Irish">Irish</option>
+            <option value="Israeli">Israeli</option>
             <option value="Italian">Italian</option>
+            <option value="Japanese">Japanese</option>
             <option value="Norwegian">Norwegian</option>
+            <option value="Persian">Persian</option>
             <option value="Polish">Polish</option>
             <option value="Roman">Roman</option>
+            <option value="Scottish">Scottish</option>
             <option value="Slovenian">Slovenian</option>
+            <option value="Spanish">Spanish</option>
             <option value="Swiss">Swiss</option>
         </select>
 
@@ -42,8 +57,8 @@
             <option value="Female">Female</option>
             <option value="Non-binary">Non-Binary</option>
         </select>
+        <a href="#" id="reset-filters" class="button">Reset Filters</a>
 
-        <button id="clear-filters">Clear Filters</button>
     </section>
 
     <section id="philosopher-list"></section>
