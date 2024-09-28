@@ -17,6 +17,25 @@ function hideSpinner() {
     document.getElementById('loading-spinner').classList.remove('show');
 }
 
+function debounce(func, delay) {
+    let timeoutId;
+    return function (...args) {
+        clearTimeout(timeoutId);
+        timeoutId = setTimeout(() => {
+            func.apply(this, args);
+        }, delay);
+    };
+}
+
+// Debounce the filter inputs
+[nationalityInput, genderInput].forEach(input => {
+    input.addEventListener('input', debounce(async () => {
+        showSpinner();
+        await renderPhilosophers(sortedPhilosophers);
+        hideSpinner();
+    }, 300));  // 300ms delay
+});
+
 /**
  * Fetch philosopher data from Google Sheets CSV
  */
@@ -86,65 +105,36 @@ function sortPhilosophers(philosophers) {
 /**
  * Fetch philosopher image from Wikipedia API
  * @param {string} name
- * @returns {string} Image URL or placeholder
+ * @returns {Promise<string>} Image URL or placeholder
  */
 async function fetchPhilosopherImage(name) {
+    const cachedImage = localStorage.getItem(name);
+
+    if (cachedImage && cachedImage !== 'placeholder.jpg') {
+        return cachedImage;
+    }
+
     const url = `https://en.wikipedia.org/w/api.php?action=query&format=json&origin=*&prop=pageimages|images&piprop=thumbnail&pithumbsize=200&redirects=1&titles=${encodeURIComponent(name)}`;
     const response = await fetch(url);
     const data = await response.json();
     const page = Object.values(data.query.pages)[0];
 
-    // Handle redirects
-    if (data.query?.redirects) {
-        const resolvedTitle = data.query.redirects[0].to;
-        return fetchPhilosopherImage(resolvedTitle);
-    }
+    let imageUrl = 'placeholder.jpg';  // Default to placeholder
 
-    // Prioritize thumbnail from the infobox
     if (page?.thumbnail?.source) {
-        return page.thumbnail.source;
-    }
-
-    // Fallback to any valid image
-    if (page?.images) {
-        for (const image of page.images) {
-            if (isValidImage(image.title, name)) {
-                const imageUrl = await fetchImageUrl(image.title);
-                if (imageUrl) return imageUrl;
-            }
+        imageUrl = page.thumbnail.source;
+    } else {
+        const exactImageUrl = await fetchExactImageUrl(name);
+        if (exactImageUrl) {
+            imageUrl = exactImageUrl;
         }
     }
 
-    // Fallback to exact image search
-    const exactImageUrl = await fetchExactImageUrl(name);
-    return exactImageUrl || 'placeholder.jpg';
-}
+    if (imageUrl !== 'placeholder.jpg') {
+        localStorage.setItem(name, imageUrl);
+    }
 
-/**
- * Check if an image is valid based on its title
- * @param {string} imageTitle
- * @param {string} name
- * @returns {boolean}
- */
-function isValidImage(imageTitle, name) {
-    return imageTitle.toLowerCase().includes(name.toLowerCase()) &&
-           !imageTitle.toLowerCase().includes('portal') &&
-           !imageTitle.toLowerCase().includes('logo') &&
-           !imageTitle.toLowerCase().includes('icon') &&
-           !imageTitle.toLowerCase().endsWith('.svg');
-}
-
-/**
- * Fetch image URL for a specific image title
- * @param {string} imageTitle
- * @returns {string|null} Image URL or null
- */
-async function fetchImageUrl(imageTitle) {
-    const url = `https://en.wikipedia.org/w/api.php?action=query&format=json&origin=*&titles=${encodeURIComponent(imageTitle)}&prop=imageinfo&iiprop=url`;
-    const response = await fetch(url);
-    const data = await response.json();
-    const imagePage = Object.values(data.query.pages)[0];
-    return imagePage?.imageinfo ? imagePage.imageinfo[0].url : null;
+    return imageUrl;
 }
 
 /**
@@ -172,25 +162,35 @@ function formatYear(year) {
 }
 
 /**
- * Display philosopher card
+ * Create philosopher card without image
  * @param {Object} philosopher
- * @returns {HTMLElement} Philosopher card
+ * @returns {HTMLElement} Philosopher card without the image
  */
-async function displayPhilosopher(philosopher) {
-    const imgUrl = await fetchPhilosopherImage(philosopher.name);
+function createPhilosopherCard(philosopher) {
     const birthYear = formatYear(philosopher.born);
     const deathYear = philosopher.died ? formatYear(philosopher.died) : "Present";
 
     const card = document.createElement('div');
     card.className = 'philosopher-card';
     card.innerHTML = `
-        <img src="${imgUrl}" alt="${philosopher.name}" onerror="this.src='placeholder.jpg';">
+        <img src="placeholder.jpg" alt="${philosopher.name}" loading="lazy">
         <h3 class="philosopher-name">${philosopher.name}</h3>
         <p class="philosopher-years">${birthYear} - ${deathYear}</p>
         <p class="philosopher-summary">${philosopher.summary}</p>
         <a href="https://en.wikipedia.org/wiki/${encodeURIComponent(philosopher.name)}" target="_blank" class="button">Learn More</a>
     `;
     return card;
+}
+
+/**
+ * Display philosopher images after rendering the cards
+ * @param {HTMLElement} card
+ * @param {string} name
+ */
+async function loadImageForCard(card, name) {
+    const imgUrl = await fetchPhilosopherImage(name);
+    const imgElement = card.querySelector('img');
+    imgElement.src = imgUrl;
 }
 
 /**
@@ -214,13 +214,12 @@ async function renderPhilosophers(philosophers) {
         return;
     }
 
-    const philosopherCards = await Promise.all(filteredPhilosophers.map(displayPhilosopher));
-    philosopherCards.forEach(card => philosopherList.appendChild(card));
-
-    // Reset min-height when cards are displayed
-    philosopherList.style.minHeight = '';
+    filteredPhilosophers.forEach(philosopher => {
+        const card = createPhilosopherCard(philosopher);
+        philosopherList.appendChild(card);
+        loadImageForCard(card, philosopher.name); // Load images asynchronously
+    });
 }
-
 
 /**
  * Event listeners for filter inputs and reset button
@@ -236,20 +235,12 @@ async function renderPhilosophers(philosophers) {
 document.getElementById('reset-filters').addEventListener('click', async (e) => {
     e.preventDefault();
 
-    // Show the spinner when reset is clicked
     showSpinner();
-
-    // Reset the filter inputs
     nationalityInput.value = "";
     genderInput.value = "";
-
-    // Re-render all philosophers with the spinner shown
     await renderPhilosophers(sortedPhilosophers);
-
-    // Hide the spinner after the rendering is done
     hideSpinner();
 });
-
 
 // Fetch and display philosophers on page load
 fetchPhilosophersFromCSV();
