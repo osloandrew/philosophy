@@ -118,36 +118,34 @@ header p {
         width: 80%;
     }
 
+    header {
+        padding: 10px 0; /* Reduce padding for a more compact header */
+        height: 100px; /* Keep a fixed height */
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+    }
+
+    header h1 {
+        font-size: 2em;
+    }
+
+    header p {
+        font-size: 0.8em;
+    }
+
     #philosopher-list {
-        grid-template-columns: 1fr;
-        padding: 20px 0 20px 0 !important;
+        grid-template-columns: 1fr; /* Ensure one card per row on mobile */
     }
 
     .philosopher-card {
-        margin: auto;
-        width: 80% !important; /* Set the philosopher card to take up 100% of the screen width */
-    }
+        margin: 0 auto; /* Center the card horizontally */    }
 
     .philosopher-card a.button,
     #reset-filters {
         font-size: 1em;
         padding: 12px 16px;
-    }
-
-    header {
-        padding: 10px 15px; /* Match the exact padding of the Norwegian website */
-    }
-
-    header h1 {
-        font-size: 10vw !important; /* Match the responsive font size of the Norwegian website */
-        margin-top: -5px; /* Ensure no extra space above the title */
-        margin-bottom: 10px; /* Match the spacing from the Norwegian website */
-        white-space: nowrap; /* Ensure text doesn't wrap unnecessarily */
-    }
-
-    header p {
-        font-size: 3vw !important; /* Match the Norwegian website's font size */
-        margin: -10px 0 0 0 !important; /* Align the margin exactly */
     }
 
     #reset-filters {
@@ -203,7 +201,7 @@ footer {
     flex-direction: column;
     justify-content: space-between;
     min-height: 350px; /* Ensure consistent height without overflow */
-    width: 280px;  /* Set a fixed width */
+    width: 280px;  /* Set a fixed width for non-mobile views */
 }
 
 /* Image and name section */
