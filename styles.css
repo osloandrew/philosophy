@@ -26,29 +26,27 @@ body > *:not(footer) {
 
 /* Header */
 header {
-    background-color: #A3B18A; /* Soft olive green */
+    padding: 20px; /* Match the padding of the second website */
+    background-color: #A3B18A; /* Keep your current background color */
     color: white;
-    margin: 0;
-    padding: 30px 0;
     text-align: center;
-    width: 100%;
 }
 
 header h1 {
+    font-size: 50px; /* Match the font size of the second website */
     color: #2d2c2c;
     font-family: 'Grenze Gotisch', serif;
-    font-size: 3em;
-    margin-bottom: 5px;
 }
 
 header p {
     color: #2d2c2c;
     font-family: 'Noto Sans', sans-serif;
-    font-size: 1.2em;
     margin-bottom: 20px;
-    font-weight: 400;
     letter-spacing: .1rem;
+    font-size: 18px; /* Match the font size of the second website */
+    font-weight: 600; /* Adjust font weight to match the second website */
     text-transform: uppercase;
+    margin-top: -20px; /* Add negative margin for tighter spacing, like in the second website */
 }
 
 /* Filter Section */
@@ -125,6 +123,11 @@ header p {
         padding: 20px 0 20px 0 !important;
     }
 
+    .philosopher-card {
+        margin: auto;
+        width: 80% !important; /* Set the philosopher card to take up 100% of the screen width */
+    }
+
     .philosopher-card a.button,
     #reset-filters {
         font-size: 1em;
@@ -132,15 +135,19 @@ header p {
     }
 
     header {
-        padding: 15px 0;
+        padding: 10px 15px; /* Match the exact padding of the Norwegian website */
     }
 
     header h1 {
-        font-size: 2em;
+        font-size: 10vw !important; /* Match the responsive font size of the Norwegian website */
+        margin-top: -5px; /* Ensure no extra space above the title */
+        margin-bottom: 10px; /* Match the spacing from the Norwegian website */
+        white-space: nowrap; /* Ensure text doesn't wrap unnecessarily */
     }
 
     header p {
-        font-size: 1em;
+        font-size: 3vw !important; /* Match the Norwegian website's font size */
+        margin: -10px 0 0 0 !important; /* Align the margin exactly */
     }
 
     #reset-filters {
@@ -172,14 +179,12 @@ footer {
 /* Philosopher List */
 #philosopher-list {
     display: grid;
-    gap: 30px; /* Space between the cards */
-    grid-template-columns: repeat(auto-fit, 280px); /* Fixed card width */
-    justify-content: center; /* Center the cards */
-    justify-items: center; /* Ensure each card is centered */
+    gap: 15px; /* Equal spacing both horizontally and vertically */
+    grid-template-columns: repeat(auto-fit, minmax(280px, max-content)); /* Ensure cards stay fixed width and centered */
+    justify-content: center; /* Center the group of cards */
     margin: 0 auto;
     padding: 20px;
-    width: 100%; /* Full width grid */
-    max-width: 1200px; /* Limit the max width of the grid */
+    max-width: 1400px; /* Adjust the maximum width to prevent overflow */
     flex-grow: 1;
     min-height: 300px;
 }
@@ -188,15 +193,17 @@ footer {
 /* Philosopher Cards */
 .philosopher-card {
     background-color: white;
-    border-radius: 6px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    border: 1px solid #ccc;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
     padding: 15px;
     text-align: center;
-    transition: transform 0.2s ease;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
     display: flex;
-    max-width: 300px;
     flex-direction: column;
     justify-content: space-between;
+    min-height: 350px; /* Ensure consistent height without overflow */
+    width: 280px;  /* Set a fixed width */
 }
 
 /* Image and name section */
@@ -210,30 +217,43 @@ footer {
     object-fit: cover;
 }
 
-.philosopher-card h3 {
-    font-size: 1.2em;
+/* Ensure consistent height for philosopher name */
+.philosopher-card h3.philosopher-name {
+    font-size: 1.1em;
     margin: 6px 0;
-    color: #2d2c2c;
+    color: #5f5f5f;
+    min-height: 40px; /* Adjust this based on name length */
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
+/* Ensure consistent height for philosopher years */
 .philosopher-card p.philosopher-years {
     font-size: 1em;
-    color: #666;
-    margin: 4px 0;
+    font-weight: 300;
+    color: #8a8a8a;
+    margin: 2px 0;
+    letter-spacing: .05rem;
+    min-height: 20px; /* Adjust based on year formatting */
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
-/* Summary */
+/* Ensure consistent height for philosopher summary */
 .philosopher-card p.philosopher-summary {
     flex-grow: 1;
     font-size: 1em;
     color: #666;
     font-family: 'Noto Serif', serif;
-    margin: 10px 0;
+    margin: 5px 0 15px 0;
     overflow: hidden;
     text-overflow: ellipsis;
     display: -webkit-box;
     -webkit-line-clamp: 3;
     -webkit-box-orient: vertical;
+    min-height: 60px; /* Ensure all summaries have consistent height */
 }
 
 /* Button section */
